@@ -1,0 +1,2 @@
+rm_description
+-DCATKIN_DEVEL_PREFIX=/home/mialbro/Desktop/robot-manipulation/simulation/devel -DCMAKE_INSTALL_PREFIX=/home/mialbro/Desktop/robot-manipulation/simulation/install -G Unix Makefiles
