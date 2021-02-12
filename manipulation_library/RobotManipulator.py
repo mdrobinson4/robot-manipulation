@@ -1,36 +1,44 @@
 import sympy
+import numpy as np
+import math
 
 class RobotManipulator:
-    def __init__(self, model_path='dh/abb', model_type='dh'):
+    def __init__(self, model_path='dh/abb.npy', model_type='dh'):
         self.model_type = model_type
-        self.h_transforms = getDH(model_path)
+        self.theta = [sympy.symbols("th1, th2, th3, th4, th5, th6")]
+        self.ht = self.getDH(model_path)
 
     def getDH(self, model_path):
-        dh = np.load(model_path).item()
+        dh = np.load('dh/abb.npy', allow_pickle=True).item()
         transform_cnt = len(dh['a'])
         A = []
         for i in range(0, transform_cnt):
             a = dh['a'][i]
             alpha = dh['alpha'][i]
-            d = dh['d'][i]
+            d = math.radians(dh['d'][i])
             theta = dh['theta'][i]            
 
-            Ai = [math.cos(theta), -math.sin(theta) * math.cos(alpha), math.sin(theta) * math.sinn(alpha), a * math.cos(theta);
-                math.sin(theta), math.cos(theta) * math.cos(alpha), -math.cos(theta) * math.sin(alpha), a * math.sinn(theta);
-                0, math.sin(alpha), math.cos(alpha), d;
-                0, 0, 0, 1]
-                
+            Ai = sympy.Matrix([
+                    [sympy.cos(theta), -sympy.sin(theta) * sympy.cos(alpha), sympy.sin(theta) * sympy.sin(alpha), a * sympy.cos(theta)],
+                    [sympy.sin(theta), sympy.cos(theta) * sympy.cos(alpha), -sympy.cos(theta) * sympy.sin(alpha), a * sympy.sin(theta)],
+                    [0, sympy.sin(alpha), sympy.cos(alpha), d],
+                    [0, 0, 0, 1]
+            ])
+            
+            if len(A) > 0:
+                Ai = A[-1] * Ai
             A.append(Ai)
+        return A
 
-        return
+    def fk(self, joint_values):
+        f = sympy.lambdify(self.theta, self.ht[1], 'numpy')
+        T = f(joint_values)
+        return T
 
     def solveAnalytJacob(self):
         return
 
     def solveGeomJacobian(self):
-        return
-
-    def fk(self, joint_values):
         return
 
     def fvk(self, joint_values):

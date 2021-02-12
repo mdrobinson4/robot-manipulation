@@ -1,4 +1,7 @@
-import Robot_Manipulator as Manipulator
+from RobotManipulator import RobotManipulator
 
-model_path = '/models/abb/dh'
-robot = Manipulator(model_path)
+model_path = 'dh/abb.npy'
+robot = RobotManipulator(model_path)
+
+joint_values = [0, 0, 0, 0, 0, 0]
+print(robot.fk(joint_values))
